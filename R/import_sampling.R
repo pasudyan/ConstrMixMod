@@ -1,7 +1,7 @@
 #'  Monte Carlo integration function
 #' 
 #' This function evaluates an integral using Monte Carlo integration. 
-#' @param constr a function that describes the domain or constraint of the samples
+#' @param constr a function that describes the domain or constraint of the observations
 #' @param mn mean of the observations to be generated
 #' @param cv covariance matrix of the observations to be generated
 #' @param num_obs number of observations to be generated
@@ -20,10 +20,10 @@ mc_inter <- function(constr, mn, cv, num_obs){
   return(mc_int)
 }
 
-#' Monte Carlo integration function
+#' Important Sampling function
 #' 
-#' This function evaluates an integral using Monte Carlo integration. 
-#' @param constr a function that describes the domain or constraint of the samples
+#' This function evaluates integrals using an important sampling method with a Gaussian distribution proposal
+#' @param constr a function that describes the domain or constraint of the observations
 #' @param mn mean of the observations to be generated
 #' @param cv covariance matrix of the observations to be generated
 #' @param num_obs number of observations to be generated
@@ -31,7 +31,7 @@ mc_inter <- function(constr, mn, cv, num_obs){
 #' @export
 #' @examples 
 #' constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
-#' mc_inter(constr, 1/2, 0.1, 100)
+#' important_sampling(constr, 1/2, 0.1, 100)
 #'  
 import_sampling <- function(constr, mn, cv, num_obs){
   # Parameters of proposal - q 
@@ -55,6 +55,19 @@ import_sampling <- function(constr, mn, cv, num_obs){
   return(imps)
 }
 
+#' Normalized Important Sampling function
+#' 
+#' This function evaluates integrals using a normalized important sampling method with a Gaussian distribution proposal
+#' @param constr a function that describes the domain or constraint of the observations
+#' @param mn mean of the observations to be generated
+#' @param cv covariance matrix of the observations to be generated
+#' @param num_obs number of observations to be generated
+#' @return value of integrals
+#' @export
+#' @examples 
+#' constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
+#' important_sampling_norm(constr, 1/2, 0.1, 100)
+#'
 import_sampling_norm <- function(constr, mn, cv, num_obs){
   # Normalized important sampling 
   # Parameters of proposal - q 
@@ -79,6 +92,21 @@ import_sampling_norm <- function(constr, mn, cv, num_obs){
   return(imps)
 }
 
+#' Truncated univariate Gaussian density
+#' 
+#' This function evaluates the truncated univariate Gaussian density using an important sampling procedure as the normalizing constant
+#' @param X a vector of observations where each column is the independent observations
+#' @param mn mean of the Gaussian density
+#' @param sig covariance matrix of the Gaussian density
+#' @param constr a function that describes the domain or constraint of the samples
+#' @param num_samp number of samples in the important sampling procedure
+#' @return value of the density 
+#' @export
+#' @examples 
+#' X <- rnorm(5, mean=0, sd=1)
+#' constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
+#' dtmvnorm_impsamp(X, mn, sig, constr, num_samp=1e6)
+#'
 dtmvnorm_impsamp <- function(X, mn, sig, constr, num_samp = 1e6){
   numer <- dmvn(X, mu = mn, sigma = sig, log = T)
   denom <- log(import_sampling(constr, mn = mn, cv = sig, num_obs = num_samp))
@@ -89,6 +117,25 @@ dtmvnorm_impsamp <- function(X, mn, sig, constr, num_samp = 1e6){
   return(exp(val))
 }
 
+#' Important Sampling for Multivariate variables 
+#' 
+#' This function evaluates integrals of a multivariate random variables using important sampling method with a multivariate Gaussian proposal
+#' @param constr a function that describes the domain or constraint of the observations
+#' @param mn mean of the observations to be generated
+#' @param cv covariance matrix of the observations to be generated
+#' @param mu_prop mean of the proposal distribution
+#' @param sig_prop covariance matrix of the proposal distribution
+#' @param num_obs number of observations to be generated
+#' @return value of integrals
+#' @export
+#' @examples 
+#' genconst <- function(u1, u2, l1, l2) { in_set <- function(X) {
+#'  if (nrow(X) == 1) X = t(X) 
+#'  X[1,] > l1 & X[1,] < u1 & X[2,] > l2 & X[2,] < u2 & X[3,] > l1 & 
+#'  X[3,] < u1 & X[4,] > l2 & X[4,] < u2 }}
+#' constr  <- genconst(u = 0, u = 0, l1 = 1, l2 = 1)
+#' import_sampling_mv(constr, rep(1/2, 4), diag(0.1,4), rep(0,4), diag(0.3,4), 100)
+#'  
 import_sampling_mv <- function(constr, mn, cv, mu_prop, sig_prop, num_obs){
   
   dm <- length(mn)
@@ -113,6 +160,25 @@ import_sampling_mv <- function(constr, mn, cv, mu_prop, sig_prop, num_obs){
   return(imps)
 }
 
+#' Truncated Multivariate Gaussian density
+#' 
+#' This function evaluates the truncated multivariate Gaussian density using an important sampling procedure as the normalizing constant
+#' @param X a vector of observations where each row is the dimension and each column is the independent observations
+#' @param mn mean of the multivariate Gaussian density
+#' @param sig covariance matrix of the multivariate Gaussian density
+#' @param constr a function that describes the domain or constraint of the samples
+#' @param num_samp number of samples in the important sampling procedure
+#' @param log whether log value is returned (default TRUE)
+#' @return value of density 
+#' @export
+#' @examples 
+#' genconst <- function(u1, u2, l1, l2) { in_set <- function(X) {
+#'  if (nrow(X) == 1) X = t(X) 
+#'  X[1,] > l1 & X[1,] < u1 & X[2,] > l2 & X[2,] < u2 & X[3,] > l1 & 
+#'  X[3,] < u1 & X[4,] > l2 & X[4,] < u2 }}
+#' constr  <- genconst(u1 = 0, u2 = 0, l1 = 1, l2 = 1)
+#' dtmvnorm_impsamp_mv(X = mvnfast::rmvn(5, mu = rep(0,4), sigma = diag(0.1, 4)), mn = rep(0, 4), sig = diag(0.1,4), constr, num_samp = 1000, log = F)
+#' 
 dtmvnorm_impsamp_mv <- function(X, mn, sig, constr, num_samp = 10000, log = T){
   numer <- dmvn(X, mu = mn, sigma = sig, log = T)
   
