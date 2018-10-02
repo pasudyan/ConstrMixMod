@@ -2,6 +2,7 @@
 
 export(dtmvnorm_impsamp)
 export(dtmvnorm_impsamp_mv)
+export(edit_pred_prob)
 export(gen_mog)
 export(give_ind)
 export(import_sampling)
@@ -15,3 +16,5 @@ export(nig)
 export(nig.post)
 export(niw)
 export(niw.post)
+export(norm_cdf)
+export(post_pred_motgt)
