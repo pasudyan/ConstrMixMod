@@ -24,5 +24,5 @@ This function evaluates integrals using an important sampling method with a Gaus
 \examples{
 constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
 important_sampling(constr, 1/2, 0.1, 100)
- 
+
 }

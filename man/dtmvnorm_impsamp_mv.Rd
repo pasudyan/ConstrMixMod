@@ -27,10 +27,10 @@ This function evaluates the truncated multivariate Gaussian density using an imp
 }
 \examples{
 genconst <- function(u1, u2, l1, l2) { in_set <- function(X) {
- if (nrow(X) == 1) X = t(X) 
- X[1,] > l1 & X[1,] < u1 & X[2,] > l2 & X[2,] < u2 & X[3,] > l1 & 
+ if (nrow(X) == 1) X = t(X)
+ X[1,] > l1 & X[1,] < u1 & X[2,] > l2 & X[2,] < u2 & X[3,] > l1 &
  X[3,] < u1 & X[4,] > l2 & X[4,] < u2 }}
-constr  <- genconst(u = 0, u = 0, l1 = 1, l2 = 1)
-important_sampling_mv(constr, rep(1/2, 2), diag(0.1,2), rep(0,2), diag(0.3,2), 100)
+constr  <- genconst(u1 = 0, u2 = 0, l1 = 1, l2 = 1)
+dtmvnorm_impsamp_mv(X = mvnfast::rmvn(5, mu = rep(0,4), sigma = diag(0.1, 4)), mn = rep(0, 4), sig = diag(0.1,4), constr, num_samp = 1000, log = F)
 
 }

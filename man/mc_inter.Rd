@@ -24,5 +24,5 @@ This function evaluates an integral using Monte Carlo integration.
 \examples{
 constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
 mc_inter(constr, 1/2, 0.1, 100)
-                                
+
 }

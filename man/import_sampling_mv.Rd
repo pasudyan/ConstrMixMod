@@ -27,10 +27,10 @@ This function evaluates integrals of a multivariate random variables using impor
 }
 \examples{
 genconst <- function(u1, u2, l1, l2) { in_set <- function(X) {
- if (nrow(X) == 1) X = t(X) 
- X[1,] > l1 & X[1,] < u1 & X[2,] > l2 & X[2,] < u2 & X[3,] > l1 & 
+ if (nrow(X) == 1) X = t(X)
+ X[1,] > l1 & X[1,] < u1 & X[2,] > l2 & X[2,] < u2 & X[3,] > l1 &
  X[3,] < u1 & X[4,] > l2 & X[4,] < u2 }}
 constr  <- genconst(u = 0, u = 0, l1 = 1, l2 = 1)
-important_sampling_mv(constr, rep(1/2, 2), diag(0.1,2), rep(0,2), diag(0.3,2), 100)
- 
+import_sampling_mv(constr, rep(1/2, 4), diag(0.1,4), rep(0,4), diag(0.3,4), 100)
+
 }
