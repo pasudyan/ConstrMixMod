@@ -12,8 +12,6 @@ Infernce_ConstrMixMod(mix, data_type, thr)
 \item{data_type}{one of "gauss", "beta", "bvgauss", "flowcyto", "crime"}
 
 \item{thr}{vector of number of rejections per observations.}
-
-\item{constr}{function to check constraints}
 }
 \value{
 samples from posterior distribution

@@ -1,22 +1,21 @@
 
 # Required packages
-library(mclust)
-library(tmvtnorm)
-library(invgamma)
-library(truncnorm)
-library(mvnfast)
-library(sp)
-library(matrixStats)
-library(ggplot2)
-library(MCMCpack)
-library(mvtnorm)
+req_packages <- c("mclust", "tmvtnorm", "invgamma",
+                  "truncnorm", "mvnfast", "sp",
+                  "matrixStats", "ggplot2", "MCMCpack",
+                  "mvtnorm", "devtools")
+if (!require(req_packages)){
+  install.packages(req_packages)
+  devtools::install_github("jakesherman/easypackages")
+  library(easypackages)
+  libraries(req_packages)
+}
 
 #'  Main function for inference
 #'
 #' This function evaluates the cumulative distribution of a univariate Gaussian distribution
 #' @param mix one of "tmog" and "motg"
 #' @param data_type one of "gauss", "beta", "bvgauss", "flowcyto", "crime"
-#' @param constr function to check constraints
 #' @param thr vector of number of rejections per observations.
 #' @return samples from posterior distribution
 #' @export
