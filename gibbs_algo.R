@@ -7,13 +7,14 @@
 #' @param burnIn number of burn-in for the chain. Must be less than number of iterations
 #' @param numIter total number of iterations
 #' @param constr function for the constraints
-#' @param mix one of "tmogt" and "motg"
+#' @param mix one of "tmog" and "motg"
 #' @param lower lower constraint for unit square
 #' @param upper upper constriant for unit square
 #' @param data_type one of "gauss", "beta", "flowcyto", "crime", "bvgauss"
 #' @return a list of results consisting of weights, mean, and covariance matrix for every iterations, along with the rejected proposals
 #' @export
-inf_gvhd <- function(K, ip_data, thr = Inf, burnIn, numIter, constr, mix, lower, upper, data_type) {
+#'
+gibbs_sampling <- function(K, ip_data, thr = Inf, burnIn, numIter, constr, mix, lower, upper, data_type) {
 
   # Dimension and number of observations
   dm      <- dim(ip_data)[1]
@@ -127,12 +128,12 @@ inf_gvhd <- function(K, ip_data, thr = Inf, burnIn, numIter, constr, mix, lower,
       # Set rejection storage to empty again
       rej_samp <- rep(list(list()), K)
 
-    } else if (mix == "tmogt"){
+    } else if (mix == "tmog"){
       # Sample rejections
       smpls_rejs <- impute_rej(K, params, N, constr, thr, dm, ceil_rej)
 
       # Function to update params
-      params <- updt_params_tmogt(K, alp,
+      params <- updt_params_tmog(K, alp,
                                   x_rejs = cbind(ip_data, smpls_rejs$rejs),
                                   dm, params$wt,
                                   niw_p, z_rejs = c(z, smpls_rejs$z))
@@ -157,14 +158,14 @@ inf_gvhd <- function(K, ip_data, thr = Inf, burnIn, numIter, constr, mix, lower,
       }
 
       # Update assignments
-      z <- updt_assgn_tmogt(K, ip_data, N, dm, params)
+      z <- updt_assgn_tmog(K, ip_data, N, dm, params)
 
       if (iter > burnIn){
         rslt[[iter-burnIn]] <- params
         rslt[[iter-burnIn]]$cnt_rej  <- smpls_rejs$rej_acc
       }
     } else {
-      stop("Mixture is not one of motg, motgt, or tmogt")
+      stop("Mixture is not one of motg, motgt, or tmog")
     }
 
   }

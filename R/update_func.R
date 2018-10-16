@@ -104,29 +104,6 @@ updt_wghts <- function(z, K, alp){
   return(wt)
 }
 
-#' Edit probability
-#'
-#' This function fixes the underflow and overflow of probability output with 0's
-#' @param X vector of probabilities
-#' @return vector of fixed probabilities
-#' @export
-edit_prob <- function(X){
-  X[is.nan(X) == T] <- 0
-  X[X == Inf]       <- 0
-  return(X)
-}
-
-#' Normalize probabilities
-#'
-#' This function normalizes a probability distribution
-#' @param X vector of probabilities
-#' @return normalize vector of probabilities
-#' @export
-prob_norm <- function(X){
-  norm <- X - logSumExp(X)
-  return(norm)
-}
-
 #' Update assignment for univariate MoTG model
 #'
 #' This function updates the cluster assignment of each observation in the MoTG model
@@ -315,7 +292,7 @@ updt_assgn_motg <- function(K, ip_data, z, dm, rej, N, params, thr) {
 #' @param params list of parameters which include weights (wt), mean (mu), and covariance matrix (cv) for all clusters
 #' @return vector of new cluster assignments
 #' @export
-updt_assgn_tmogt <- function(K, ip_data, N, dm, params) {
+updt_assgn_tmog <- function(K, ip_data, N, dm, params) {
 
   # Store new parameters and weights
   wt <- params$wt
@@ -451,7 +428,7 @@ updt_params <- function(K, alp, ip_data, dm, niw_p, z) {
 #' @param z_rejs cluster assignments for rejected proposals
 #' @return list of new weights, mean, covariance matrix, number of rejected proposals, and number of observations in each cluster
 #' @export
-updt_params_tmogt <- function(K, alp, x_rejs, dm, wt, niw_p, z_rejs) {
+updt_params_tmog <- function(K, alp, x_rejs, dm, wt, niw_p, z_rejs) {
   # This function update the parameters for each component using
   # the stick breaking construction after observations are placed
   # in a cluster

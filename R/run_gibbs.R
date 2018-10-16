@@ -1,17 +1,17 @@
 
-# Required packages
-req_packages <- c("mclust", "tmvtnorm", "invgamma",
-                  "truncnorm", "mvnfast", "sp",
-                  "matrixStats", "ggplot2", "MCMCpack",
-                  "mvtnorm", "devtools")
-if (!require(req_packages)){
-  install.packages(req_packages)
-  devtools::install_github("jakesherman/easypackages")
-  library(easypackages)
-  libraries(req_packages)
-}
+# #Required packages
+# req_packages <- c("mclust", "tmvtnorm", "invgamma",
+#                   "truncnorm", "mvnfast", "sp",
+#                   "matrixStats", "ggplot2", "MCMCpack",
+#                   "mvtnorm", "devtools")
+# if (!require(req_packages)){
+#   install.packages(req_packages)
+#   devtools::install_github("jakesherman/easypackages")
+#   library(easypackages)
+#   libraries(req_packages)
+# }
 
-#'  Main function for inference
+#' Main function for inference
 #'
 #' This function evaluates the cumulative distribution of a univariate Gaussian distribution
 #' @param mix Mixture type: one of "tmog" and "motg"
@@ -20,7 +20,7 @@ if (!require(req_packages)){
 #' @return samples from posterior distribution
 #' @export
 #'
-Infernce_ConstrMixMod <- function(mix, data_type, thr){
+inf_constr_mixmod <- function(mix, data_type, thr){
 
   # Check correct inputs
   if (!(mix %in% c("tmog", "motg"))){
@@ -250,7 +250,7 @@ Infernce_ConstrMixMod <- function(mix, data_type, thr){
   }
 
   # Initialize variables
-  time.taken    <- c()
+  time_taken    <- c()
   test_pred     <- list()
   prod_pred_ts  <- c()
   prod_pred_pt  <- c()
@@ -260,18 +260,19 @@ Infernce_ConstrMixMod <- function(mix, data_type, thr){
   print(paste("Mix:", mix))
   print(paste("Data Type:", data_type))
 
+  # ============= Run Gibbs Sampling and Posterior Probabilities ============= #
   # Loop over all thresholds
   for (j in 1:length(thr)){
     print(paste("Threshold: ", thr[j]))
 
     # Function to run Gibbs sampling and timed
-    start.time <- system.time({
-      rslt[[j]] <- inf_gvhd(K, ip_data = train, axs,
+    start_time <- system.time({
+      rslt[[j]] <- gibbs_sampling(K, ip_data = train, axs,
                             thr = thr[j], burnIn, numIter,
                             constr, mix, lower, upper, data_type)
     })
 
-    time.taken[j] <- start.time[3]
+    time_taken[j] <- start_time[3]
 
     # Functions to compute posterior predictive probabilities of the test set
     if (dm == 1){
@@ -279,8 +280,8 @@ Infernce_ConstrMixMod <- function(mix, data_type, thr){
         test_pred[[j]]  <- post_pred_motgt(res = rslt[[j]]$res,
                                            test, K, pts, upper, lower,
                                            data_type, pr1, pr2)
-      if (mix == "tmogt")
-        test_pred[[j]]  <- post_pred_tmogt(res = rslt[[j]]$res,
+      if (mix == "tmog")
+        test_pred[[j]]  <- post_pred_tmog(res = rslt[[j]]$res,
                                            test, K, pts, upper, lower,
                                            data_type, pr1, pr2)
 
@@ -292,8 +293,8 @@ Infernce_ConstrMixMod <- function(mix, data_type, thr){
         test_pred[[j]]  <- post_pred_motgt_mv(res = rslt[[j]]$res,
                                               test, K, lower, upper, constr)
 
-      if (mix == "tmogt")
-        test_pred[[j]]  <- post_pred_tmogt_mv(res = rslt[[j]]$res, test, K,
+      if (mix == "tmog")
+        test_pred[[j]]  <- post_pred_tmog_mv(res = rslt[[j]]$res, test, K,
                                               constr, thin_sc)
 
       prod_pred_ts[j]    <- sum(log(test_pred[[j]]$pred_ts))
@@ -307,36 +308,11 @@ Infernce_ConstrMixMod <- function(mix, data_type, thr){
   }
 
   ppred_all <- prod_pred_ts
-  time_all  <- time.taken
+  time_all  <- time_taken
 
   return(list(result = rslt, ppred = ppred_all, time = time_all))
 }
 
-#' Rejection summary
-#'
-#' This function summarizes the value for the rejected samples
-#' @param rejs vector of rejected samples
-#' @param brks break points of the bins to summarize the rejections
-#' @return number of samples in the bins
-#' @export
-#'
-rej_summary <- function(rejs, brks){
-  rej_all <- rejs
-  bins    <- table(cut(rej_all, brks, include.lowest = T, right = F))
-  return(bins)
-}
 
-#' Counting the rejections
-#'
-#' This function summarizes the value for the rejected samples
-#' @param res_list list of the results of the gibbs sampling procedure
-#' @return number of total rejections
-#' @export
-#'
-count_rej <- function(res_list){
-  unlist(lapply(1:length(res_list), function(x){
-    sum(res_list[[x]]$cnt_rej)
-  }))
-}
 
 

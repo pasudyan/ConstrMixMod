@@ -1,4 +1,4 @@
-#'  Monte Carlo integration function
+#' Monte Carlo integration function
 #'
 #' This function evaluates an integral using Monte Carlo integration.
 #' @param constr a function that describes the domain or constraint of the observations
@@ -6,11 +6,11 @@
 #' @param cv covariance matrix of the observations to be generated
 #' @param num_obs number of observations to be generated
 #' @return value of integrals
-#' @export
 #' @examples
 #' constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
 #' mc_inter(constr, 1/2, 0.1, 100)
 #'
+#' @export
 mc_inter <- function(constr, mn, cv, num_obs){
   # Monte Carlo integration:
   rsamp    <- matrix(mvnfast::rmvn(num_obs, mn, cv), nrow = 1)
@@ -28,10 +28,10 @@ mc_inter <- function(constr, mn, cv, num_obs){
 #' @param cv covariance matrix of the observations to be generated
 #' @param num_obs number of observations to be generated
 #' @return value of integrals
-#' @export
 #' @examples
 #' constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
 #' important_sampling(constr, 1/2, 0.1, 100)
+#' @export
 #'
 import_sampling <- function(constr, mn, cv, num_obs){
   # Parameters of proposal - q
@@ -63,11 +63,10 @@ import_sampling <- function(constr, mn, cv, num_obs){
 #' @param cv covariance matrix of the observations to be generated
 #' @param num_obs number of observations to be generated
 #' @return value of integrals
-#' @export
 #' @examples
 #' constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
 #' important_sampling_norm(constr, 1/2, 0.1, 100)
-#'
+#' @export
 import_sampling_norm <- function(constr, mn, cv, num_obs){
   # Normalized important sampling
   # Parameters of proposal - q
@@ -101,12 +100,11 @@ import_sampling_norm <- function(constr, mn, cv, num_obs){
 #' @param constr a function that describes the domain or constraint of the samples
 #' @param num_samp number of samples in the important sampling procedure
 #' @return value of the density
-#' @export
 #' @examples
 #' X <- rnorm(5, mean=0, sd=1)
 #' constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
 #' dtmvnorm_impsamp(X, mn, sig, constr, num_samp=1e6)
-#'
+#' @export
 dtmvnorm_impsamp <- function(X, mn, sig, constr, num_samp = 1e6){
   numer <- dmvn(X, mu = mn, sigma = sig, log = T)
   denom <- log(import_sampling(constr, mn = mn, cv = sig, num_obs = num_samp))
@@ -127,7 +125,6 @@ dtmvnorm_impsamp <- function(X, mn, sig, constr, num_samp = 1e6){
 #' @param sig_prop covariance matrix of the proposal distribution
 #' @param num_obs number of observations to be generated
 #' @return value of integrals
-#' @export
 #' @examples
 #' genconst <- function(u1, u2, l1, l2) { in_set <- function(X) {
 #'  if (nrow(X) == 1) X = t(X)
@@ -135,7 +132,7 @@ dtmvnorm_impsamp <- function(X, mn, sig, constr, num_samp = 1e6){
 #'  X[3,] < u1 & X[4,] > l2 & X[4,] < u2 }}
 #' constr  <- genconst(u = 0, u = 0, l1 = 1, l2 = 1)
 #' import_sampling_mv(constr, rep(1/2, 4), diag(0.1,4), rep(0,4), diag(0.3,4), 100)
-#'
+#' @export
 import_sampling_mv <- function(constr, mn, cv, mu_prop, sig_prop, num_obs){
 
   dm <- length(mn)
@@ -170,7 +167,6 @@ import_sampling_mv <- function(constr, mn, cv, mu_prop, sig_prop, num_obs){
 #' @param num_samp number of samples in the important sampling procedure
 #' @param log whether log value is returned (default TRUE)
 #' @return value of density
-#' @export
 #' @examples
 #' genconst <- function(u1, u2, l1, l2) { in_set <- function(X) {
 #'  if (nrow(X) == 1) X = t(X)
@@ -178,7 +174,7 @@ import_sampling_mv <- function(constr, mn, cv, mu_prop, sig_prop, num_obs){
 #'  X[3,] < u1 & X[4,] > l2 & X[4,] < u2 }}
 #' constr  <- genconst(u1 = 0, u2 = 0, l1 = 1, l2 = 1)
 #' dtmvnorm_impsamp_mv(X = mvnfast::rmvn(5, mu = rep(0,4), sigma = diag(0.1, 4)), mn = rep(0, 4), sig = diag(0.1,4), constr, num_samp = 1000, log = F)
-#'
+#' @export
 dtmvnorm_impsamp_mv <- function(X, mn, sig, constr, num_samp = 10000, log = T){
   numer <- dmvn(X, mu = mn, sigma = sig, log = T)
 

@@ -6,7 +6,6 @@
 #' @param a0 shape parameter for the Inverse-Gamma distribution (real > 0)
 #' @param b0 rate parameter for the Inverse-Gamma distribution (real > 0)
 #' @return list with mean and variance
-#' @export
 #' @examples
 #' nig(0, 2, 2, 1)
 #'
@@ -26,11 +25,10 @@ nig <- function(m0, v0, a0, b0) {
 #' @param b0 rate parameter for the Inverse-Gamma distribution (real > 0)
 #' @param SS a list which includes list(n = number of observations, mn = mean, S = covariance)
 #' @return a list with mean and variance
-#' @export
 #' @examples
 #' nig.post(0, 1, 2, 3, list(n = 2, mn = 1, S = 0.1))
 #'
-nig.post <- function(m0, v0, a0, b0, SS) {
+nig_post <- function(m0, v0, a0, b0, SS) {
   n     <- SS$n
   mn    <- SS$mn
   S     <- SS$S  #S = t(X - mn) %*% (X - mn)
@@ -52,7 +50,6 @@ nig.post <- function(m0, v0, a0, b0, SS) {
 #' @param Phi a positive definite scale matrix for the Inverse-Wishart distribution
 #' @param nu degrees of freedom parameter for the Inverse-Whisart distribution
 #' @return list with mean and covariance matrix
-#' @export
 #' @examples
 #' niw(rep(1/2,2), 1, diag(0.1, 2), 2)
 #'
@@ -73,12 +70,11 @@ niw <- function(mu0, lam, Phi, nu) {
 #' @param nu degrees of freedom parameter for the Inverse-Whisart distribution
 #' @param SS a list which includes list(n = number of observations, mn = mean, S = covariance matrix)
 #' @return a list with mean and covariance matrix
-#' @export
 #' @examples
 #' SS = list(n = 2, mn = rep(0.7, 2), S = diag(0.1,2))
 #' niw.post(rep(1/2,2), 1, diag(0.1, 2), 2, SS)
 #'
-niw.post <- function(mu0, lam, Phi, nu, SS) {
+niw_post <- function(mu0, lam, Phi, nu, SS) {
   n     <- SS$n
   mn    <- SS$mn
   S     <- SS$S     # S = t(X - mn) %*% (X - mn)

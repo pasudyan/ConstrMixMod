@@ -1,40 +1,3 @@
-#'  Cumulative distribution function
-#'
-#' This function evaluates the cumulative distribution of a univariate Gaussian distribution
-#' @param mean mean of the distribution
-#' @param sd standard deviation of the distribution
-#' @param lower lower bound
-#' @param upper upper bound
-#' @return the area between the two bounds
-#' @export
-#' @examples
-#' constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
-#' mc_inter(constr, 1/2, 0.1, 100)
-#'
-norm_cdf <- function(mean, sd, lower, upper){
-  return(pnorm(upper, mean, sd) - pnorm(lower, mean, sd))
-}
-
-#' Edit underflow of predictive probability
-#'
-#' This function edits the underflow of the predictive probability function for truncated Gaussian
-#' @param X vector of probabilities
-#' @export
-edit_pred_prob <- function(X){
-  # ================================= #
-  # Function to edit overflows        #
-  # Returns edited values             #
-  # ================================= #
-
-  ind_pinf <- which(X %in% c(Inf))
-  ind_nan  <- which(is.nan(X) == T)
-  if (length(ind_pinf) > 0)
-    X[ind_pinf] <- 0
-  if (length(ind_nan) > 0)
-    X[ind_nan] <- 0
-  return(X)
-}
-
 #' Posterior predictive for univariate MoTG
 #'
 #' This function evaluates the posterior predictive distribution for a univariate MoTG model
@@ -151,7 +114,7 @@ post_pred_motgt <- function(res, test, K, pts, upper, lower, data_type, pr1, pr2
 #' @param pr2 second parameter for the density
 #' @return list of prediction at points, prediction of tests, along with error bars
 #' @export
-post_pred_tmogt <- function(res, test, K, pts, upper, lower, data_type, pr1, pr2){
+post_pred_tmog <- function(res, test, K, pts, upper, lower, data_type, pr1, pr2){
   iter <- length(res)
 
   if (data_type == "beta"){
@@ -271,19 +234,6 @@ post_pred_tmogt <- function(res, test, K, pts, upper, lower, data_type, pr1, pr2
 
 }
 
-#' Edit log probability
-#'
-#' This function edits the log probability for underflow and overflow. Substitute Inf to -Inf and NaN to -Inf.
-#' @param X vector of probabilities.
-#' @return vector of substituted log probabilities
-#' @export
-edit_log_prob <- function(X){
-  X[X == -Inf] <- -Inf
-  X[X == Inf]  <- -Inf
-  X[is.nan(X) == T]  <- -Inf
-  return(X)
-}
-
 #' Posterior predictive for multivariate MoTG
 #'
 #' This function evaluates the posterior predictive distribution for a multivariate MoTG model
@@ -360,7 +310,7 @@ post_pred_motgt_mv <- function(res, test, K, lower, upper, constr){
 #' @param thin_sc thinning for MCMC chain (default no thinning)
 #' @return list of prediction of tests
 #' @export
-post_pred_tmogt_mv <- function(res, test, K, constr, thin_sc = 1){
+post_pred_tmog_mv <- function(res, test, K, constr, thin_sc = 1){
   # ================================================================================ #
   # Posterior predictive distribution for Truncated Mixtures of Gaussian             #
   # Only for Multi-dimensional data                                                  #

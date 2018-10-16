@@ -421,7 +421,7 @@ func_perf_plot_bvgauss <- function(time_all_result, ppred_all_result, thr, labs)
     geom_point(data = a, aes(x = time_avg, y = perf_avg, shape = thr, fill = thr), size = 2, shape = c(21, 22, 23, 24, 25)) +
     guides(shape=FALSE, fill=FALSE)
 
-    if (mix == "tmogt"){
+    if (mix == "tmog"){
       # TMoG bigSD and smallSD
       # p_time <- p_time + geom_errorbar(aes(ymin = `25%`, ymax = `75%`), stat = "identity",
       #               position = "identity", width = 0.5, size = 0.3) +
@@ -540,7 +540,7 @@ func_perf_plot_flowcyt <- function(time_all_result, ppred_all_result, thr, labs)
     # geom_errorbar(aes(ymin = `5%`, ymax = `95%`), stat = "identity",
     #               position = "identity", width = 0.01, size = 0.3) +
 
-  if (mix == "tmogt"){
+  if (mix == "tmog"){
     p_time <- p_time + geom_errorbar(aes(ymin = `25%`, ymax = `75%`), stat = "identity",
                                          position = "identity", width = 3, size = 0.3) + #w =100
       geom_errorbarh(aes(xmin = `25%_t`, xmax = `75%_t`), stat = "identity",
@@ -631,7 +631,7 @@ perf_plot_edit_time_sub_flowcyto <- function(time_all_result_1, ppred_all_result
   # geom_errorbar(aes(ymin = `5%`, ymax = `95%`), stat = "identity",
   #               position = "identity", width = 0.01, size = 0.3) +
 
-  if (mix == "tmogt"){
+  if (mix == "tmog"){
     p_time <- p_time + geom_errorbar(aes(ymin = `25%`, ymax = `75%`), stat = "identity",
                                      position = "identity", width = 5, size = 0.3) + #w =100
       geom_errorbarh(aes(xmin = `25%_t`, xmax = `75%_t`), stat = "identity",
@@ -719,7 +719,7 @@ perf_plot_edit_time_sub_crime <- function(time_all_result_1, ppred_all_result_1,
     geom_point(data = a, aes(x = time_avg, y = perf_avg, shape = thr, fill = thr), size = 2, shape = c(21, 22, 23, 24, 25)) +
     guides(shape=FALSE, fill=FALSE)
 
-  if (mix == "tmogt"){
+  if (mix == "tmog"){
     # TMoG bigSD and smallSD
     # p_time <- p_time + geom_errorbar(aes(ymin = `25%`, ymax = `75%`), stat = "identity",
     #               position = "identity", width = 0.5, size = 0.3) +
@@ -843,7 +843,7 @@ fig_error_post <- function(test_pred){
 #'
 #' This function generates a plot of the number of rejections
 #' @param count_bins number of rejections in each bins
-#' @param mix one of "tmogt" and "motg"
+#' @param mix one of "tmog" and "motg"
 #' @param thr_l lenght of the threshold vector
 #' @return histogram for the number of rejections in each threshold
 #' @export
