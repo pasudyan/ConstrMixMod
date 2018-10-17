@@ -3,7 +3,16 @@ Title: MCMC methods for flexible mixture modeling on constrained spaces
 Version: 0.0.0.9000
 Authors@R: person("Putu Ayu", "Sudyanti", email = "pasudyan@gmail.com", role = c("aut", "cre"))
 Description: This is an implementation of the MCMC methods use in the paper, Flexible Mixture Modeling on Constrained Spaces, by the author. It runs inference and prediction for mixture models in constrained spaces using Gibbs sampling methods. For more information check out the paper on Arxiv. URL: https://github.com/pasudyan
-Depends: R (>= 3.5.0), mvnfast, tmvtnorm, invgamma, truncnorm, sp, matrixStats, MCMCpack, mvtnorm
+Depends: R (>= 3.5.0)
+Imports: 
+  invgamma,
+  matrixStats,
+  MCMCpack,
+  mvnfast, 
+  mvtnorm,
+  tmvtnorm,
+  truncnorm,
+  sp  
 License: -
 Encoding: UTF-8
 LazyData: true

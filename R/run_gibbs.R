@@ -60,14 +60,14 @@ inf_constr_mixmod <- function(mix, data_type, thr){
     pr1 <- 0.5
     pr2 <- 0.1
     dm  <- 1
-    load("sim_data/data_gauss_mean_0_500.RData")
+    data("data_gauss_mean_0_500")
   }
 
   if (data_type == "beta"){
     pr1 <- 0.1
     pr2 <- 0.1
     dm  <- 1
-    load("sim_data/data_sim_beta_500.RData")
+    data("data_sim_beta_500")
   }
 
   if (dm == 1){
@@ -110,7 +110,7 @@ inf_constr_mixmod <- function(mix, data_type, thr){
   if (data_type == "bvgauss"){
 
     # Load data
-    load("sim_data/data_bvgauss_1000_2corner_modes.RData")
+    data("data_bvgauss_1000_2corner_modes")
 
     # Function to eliminate points outside the hypercube
     genconst <- function(u1, u2, l1, l2) {
@@ -180,8 +180,8 @@ inf_constr_mixmod <- function(mix, data_type, thr){
   if (data_type == "crime"){
 
     # Load crime data and constraints for the data
-    load("./crime_data/chi_murder_2012_2017.RData")
-    load("./crime_data/Neigh_coord_list.RData")
+    data("chi_murder_2012_2017")
+    data("Neigh_coord_list")
 
     # Scaling data
     scale_crime   <- 5
@@ -267,7 +267,7 @@ inf_constr_mixmod <- function(mix, data_type, thr){
 
     # Function to run Gibbs sampling and timed
     start_time <- system.time({
-      rslt[[j]] <- gibbs_sampling(K, ip_data = train, axs,
+      rslt[[j]] <- gibbs_sampling(K, ip_data = train,
                             thr = thr[j], burnIn, numIter,
                             constr, mix, lower, upper, data_type)
     })

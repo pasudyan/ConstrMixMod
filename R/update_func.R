@@ -63,9 +63,9 @@ updt_params_component <- function(X, mu, cv, niw_p, constr, thr = Inf, dm) {
 
   # Draw from the posterior
   if (dm == 1){
-    rslt  <- nig.post(niw_p$m0, niw_p$v0, niw_p$a0, niw_p$b0, SS)
+    rslt  <- nig_post(niw_p$m0, niw_p$v0, niw_p$a0, niw_p$b0, SS)
   } else {
-    rslt  <- niw.post(niw_p$mu0, niw_p$lam, niw_p$Phi, niw_p$nu, SS)
+    rslt  <- niw_post(niw_p$mu0, niw_p$lam, niw_p$Phi, niw_p$nu, SS)
   }
 
   return(list(mu = rslt$mu, cv = rslt$cv, no = nm,
@@ -404,9 +404,9 @@ updt_params <- function(K, alp, ip_data, dm, niw_p, z) {
 
     # Update posterior for each component
     if (dm == 1){
-      rslt <- nig.post(niw_p$m0, niw_p$v0, niw_p$a0, niw_p$b0, SS)
+      rslt <- nig_post(niw_p$m0, niw_p$v0, niw_p$a0, niw_p$b0, SS)
     } else {
-      rslt <- niw.post(niw_p$mu0, niw_p$lam, niw_p$Phi, niw_p$nu, SS)
+      rslt <- niw_post(niw_p$mu0, niw_p$lam, niw_p$Phi, niw_p$nu, SS)
     }
 
     mu[[i]] <- rslt$mu
@@ -471,11 +471,11 @@ updt_params_tmog <- function(K, alp, x_rejs, dm, wt, niw_p, z_rejs) {
 
     # Update posterior for each component
     if (dm == 1){
-      rslt <- nig.post(m0 = niw_p$m0, v0 = niw_p$v0,
+      rslt <- nig_post(m0 = niw_p$m0, v0 = niw_p$v0,
                        a0 = niw_p$a0,
                        b0 = niw_p$b0, SS)
     } else {
-      rslt <- niw.post(niw_p$mu0, niw_p$lam, niw_p$Phi, niw_p$nu, SS)
+      rslt <- niw_post(niw_p$mu0, niw_p$lam, niw_p$Phi, niw_p$nu, SS)
     }
 
     mu[[i]] <- rslt$mu
