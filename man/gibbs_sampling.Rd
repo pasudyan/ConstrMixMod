@@ -4,7 +4,7 @@
 \alias{gibbs_sampling}
 \title{Gibbs sampling algorithm}
 \usage{
-gibbs_sampling(K, ip_data, thr = Inf, burnIn, numIter, constr, mix,
+gibbs_sampling(K, ip_data, thr = Inf, burn_in, num_iter, constr, mix,
   lower, upper, data_type)
 }
 \arguments{
@@ -14,9 +14,9 @@ gibbs_sampling(K, ip_data, thr = Inf, burnIn, numIter, constr, mix,
 
 \item{thr}{maximum number of rejections per observations}
 
-\item{burnIn}{number of burn-in for the chain. Must be less than number of iterations}
+\item{burn_in}{number of burn-in for the chain. Must be less than number of iterations}
 
-\item{numIter}{total number of iterations}
+\item{num_iter}{total number of iterations}
 
 \item{constr}{function for the constraints}
 

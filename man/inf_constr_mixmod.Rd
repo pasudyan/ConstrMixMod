@@ -4,14 +4,18 @@
 \alias{inf_constr_mixmod}
 \title{Main function for inference}
 \usage{
-inf_constr_mixmod(mix, data_type, thr)
+inf_constr_mixmod(mix, X_data, constr, thr, constr_type, ...)
 }
 \arguments{
 \item{mix}{Mixture type: one of "tmog" and "motg"}
 
-\item{data_type}{one of "gauss", "beta", "bvgauss", "flowcyto", "crime"}
+\item{X_data}{p-by-N matrix where N is the total number of observations and p is the dimension}
 
 \item{thr}{vector of number of rejections per observations.}
+
+\item{constr_type}{one of "rectangle" and "complex". If rectangle, follow by lower and upper bounds.}
+
+\item{...}{pass lower and upper bounds of the constraint if type is "rectangle"}
 }
 \value{
 samples from posterior distribution

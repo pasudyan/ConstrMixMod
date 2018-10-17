@@ -2,8 +2,11 @@
 
 export(gibbs_sampling)
 export(inf_constr_mixmod)
-export(post_pred_motgt)
-export(post_pred_motgt_mv)
+export(inf_post_pred_mixmod)
+export(post_pred_dist)
+export(post_pred_dist_mv)
+export(post_pred_motg)
+export(post_pred_motg_mv)
 export(post_pred_tmog)
 export(post_pred_tmog_mv)
 export(updt_assgn_motg)

@@ -14,7 +14,7 @@
 #' @export
 #' @examples
 #'
-post_pred_motgt <- function(res, test, K, pts, upper, lower, data_type, pr1, pr2){
+post_pred_motg <- function(res, test, K, pts, upper, lower, data_type, pr1, pr2){
   iter = length(res)
 
   if (data_type == "beta"){
@@ -54,9 +54,9 @@ post_pred_motgt <- function(res, test, K, pts, upper, lower, data_type, pr1, pr2
       cv <- res[[i]]$cv[[k]][[1]]
       mn <- res[[i]]$mu[[k]]
 
-      pred_pt[[k]] <- dtruncnorm(pts, a = lower, b = upper,
+      pred_pt[[k]] <- truncnorm::dtruncnorm(pts, a = lower, b = upper,
                                  mean = mn, sd = sqrt(cv))
-      pred_ts[[k]] <- dtruncnorm(test, a = lower, b = upper,
+      pred_ts[[k]] <- truncnorm::dtruncnorm(test, a = lower, b = upper,
                                  mean = mn, sd = sqrt(cv))
 
       pred_pt[[k]] <- edit_pred_prob(pred_pt[[k]])
@@ -234,6 +234,35 @@ post_pred_tmog <- function(res, test, K, pts, upper, lower, data_type, pr1, pr2)
 
 }
 
+#' Posterior predictive for univariate data
+#'
+#' This function evaluates the posterior predictive distribution for univariate models
+#' @param dm dimension
+#' @param mix one of "tmog" or "motg"
+#' @param res list of results containing weight (wt), mean (mn), and covariance (cv) matrix for each cluster
+#' @param test test set where columns are the individual observations and rows are the dimension
+#' @param K number of clusters
+#' @param pts grid points to draw the density distribution
+#' @param upper upper bound of constraints, only use for unit square
+#' @param lower lower bound of constraints, only use for unit square
+#' @param data_type one of "gauss" and "beta"
+#' @param pr1 first parameter for the density
+#' @param pr2 second parameter for the density
+#' @return list of prediction at points, prediction of tests, along with error bars
+#' @export
+#' @examples
+#'
+post_pred_dist <- function(mix, res, test, K, pts, upper, lower, data_type, pr1, pr2){
+  if (mix == "tmog"){
+    ppres <- post_pred_tmog(res, test, K, pts, upper, lower, data_type, pr1, pr2)
+  } else if (mix == "motg"){
+    ppres <- post_pred_motg(res, test, K, pts, upper, lower, data_type, pr1, pr2)
+  } else {
+    stop("Mix must be one of 'tmog' and 'motg'")
+  }
+  return(ppres)
+}
+
 #' Posterior predictive for multivariate MoTG
 #'
 #' This function evaluates the posterior predictive distribution for a multivariate MoTG model
@@ -245,7 +274,7 @@ post_pred_tmog <- function(res, test, K, pts, upper, lower, data_type, pr1, pr2)
 #' @param constr a function for the constraints
 #' @return list of prediction of tests
 #' @export
-post_pred_motgt_mv <- function(res, test, K, lower, upper, constr){
+post_pred_motg_mv <- function(res, test, K, lower, upper, constr){
   # ================================================================================ #
   # Posterior predictive distribution for Mixture of Truncated Gaussian Approximate  #
   # Only for Multi-dimensional data                                                  #
@@ -353,7 +382,7 @@ post_pred_tmog_mv <- function(res, test, K, constr, thin_sc = 1){
       grd_wt_ts   <- grd_wt_ts + res[[d]]$wt[k] * exp(log_pred_ts)
 
       if (samp_method == "package")
-        area_int  <- pmvnorm(lower, upper, mean = as.vector(mn), sigma = cv)[1]
+        area_int  <- mvtnorm::pmvnorm(lower, upper, mean = as.vector(mn), sigma = cv)[1]
       if (samp_method == "is")
         area_int  <- import_sampling_mv(constr, mn, cv, mu_prop, sig_prop, num_obs_prop)
 
@@ -386,4 +415,31 @@ post_pred_tmog_mv <- function(res, test, K, constr, thin_sc = 1){
   return(list(pred_ts = exp(log_mn_pred_ts)))
 }
 
-
+#' Posterior predictive for multivariate data
+#'
+#' This function evaluates the posterior predictive distribution for univariate models
+#' @param dm dimension
+#' @param mix one of "tmog" or "motg"
+#' @param res list of results containing weight (wt), mean (mn), and covariance (cv) matrix for each cluster
+#' @param test test set where columns are the individual observations and rows are the dimension
+#' @param K number of clusters
+#' @param pts grid points to draw the density distribution
+#' @param upper upper bound of constraints, only use for unit square
+#' @param lower lower bound of constraints, only use for unit square
+#' @param data_type one of "gauss" and "beta"
+#' @param pr1 first parameter for the density
+#' @param pr2 second parameter for the density
+#' @return list of prediction at points, prediction of tests, along with error bars
+#' @export
+#' @examples
+#'
+post_pred_dist_mv <- function(mix, res, test, K, upper, lower, constr, thin_sc){
+  if (mix == "tmog"){
+    ppres <- post_pred_tmog_mv(res, test, K, constr, thin_sc = 1)
+  } else if (mix == "motg"){
+    ppres <- post_pred_motg_mv(res, test, K, lower, upper, constr)
+  } else {
+    stop("Mix must be one of 'tmog' and 'motg'")
+  }
+  return(ppres)
+}

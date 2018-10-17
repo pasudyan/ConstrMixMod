@@ -669,8 +669,8 @@ dtmvnorm_impsamp_mv <- function(X, mn, sig, constr, num_samp = 10000, log = T){
 #' @param K maximum number of clusters
 #' @param ip_data data matrix where columns are individual observations and rows are dimensions
 #' @param thr maximum number of rejections per observations
-#' @param burnIn number of burn-in for the chain. Must be less than number of iterations
-#' @param numIter total number of iterations
+#' @param burn_in number of burn-in for the chain. Must be less than number of iterations
+#' @param num_iter total number of iterations
 #' @param constr function for the constraints
 #' @param mix one of "tmog" and "motg"
 #' @param lower lower constraint for unit square
@@ -679,7 +679,7 @@ dtmvnorm_impsamp_mv <- function(X, mn, sig, constr, num_samp = 10000, log = T){
 #' @return a list of results consisting of weights, mean, and covariance matrix for every iterations, along with the rejected proposals
 #' @export
 #'
-gibbs_sampling <- function(K, ip_data, thr = Inf, burnIn, numIter, constr, mix, lower, upper, data_type) {
+gibbs_sampling <- function(K, ip_data, thr = Inf, burn_in, num_iter, constr, mix, lower, upper, data_type) {
 
   # Dimension and number of observations
   dm      <- dim(ip_data)[1]
@@ -727,13 +727,13 @@ gibbs_sampling <- function(K, ip_data, thr = Inf, burnIn, numIter, constr, mix, 
   params$rej_samp <- rej_samp
 
   # Store result
-  rslt    <- rep(list(params), (numIter-burnIn))
+  rslt    <- rep(list(params), (num_iter-burn_in))
 
   brks  <- c(seq(-4, 0, 0.05), seq(1, 4, 0.05))
   count_bins_sum <- rej_summary(-5, brks)
 
   # *********************** Gibbs Sampling loop ************************* #
-  for(iter in 1:numIter) {
+  for(iter in 1:num_iter) {
     if(iter%%100 == 0)
       print(paste("Iter", iter))
 
@@ -757,7 +757,7 @@ gibbs_sampling <- function(K, ip_data, thr = Inf, burnIn, numIter, constr, mix, 
         # Count number of rejections in partition
         if (mix == "motgt"){
           if (dm == 1){
-            if (iter == numIter)
+            if (iter == num_iter)
               rej_samp[[i]] <- pm$rej_samp
           } else {
 
@@ -787,8 +787,8 @@ gibbs_sampling <- function(K, ip_data, thr = Inf, burnIn, numIter, constr, mix, 
       new_wt <- updt_wghts(z, K, alp)
       params$wt <- new_wt
 
-      if (iter > burnIn)
-        rslt[[iter-burnIn]] <- params
+      if (iter > burn_in)
+        rslt[[iter-burn_in]] <- params
 
       # Set rejection storage to empty again
       rej_samp <- rep(list(list()), K)
@@ -818,19 +818,17 @@ gibbs_sampling <- function(K, ip_data, thr = Inf, burnIn, numIter, constr, mix, 
         }
       } else {
         # For now, save rejections
-        if (iter > burnIn)
-          rslt[[iter-burnIn]]$rej_smpls <- smpls_rejs$rejs
+        if (iter > burn_in)
+          rslt[[iter-burn_in]]$rej_smpls <- smpls_rejs$rejs
       }
 
       # Update assignments
       z <- updt_assgn_tmog(K, ip_data, N, dm, params)
 
-      if (iter > burnIn){
-        rslt[[iter-burnIn]] <- params
-        rslt[[iter-burnIn]]$cnt_rej  <- smpls_rejs$rej_acc
+      if (iter > burn_in){
+        rslt[[iter-burn_in]] <- params
+        rslt[[iter-burn_in]]$cnt_rej  <- smpls_rejs$rej_acc
       }
-    } else {
-      stop("Mixture is not one of motg, motgt, or tmog")
     }
 
   }

@@ -1,26 +1,13 @@
-
-# #Required packages
-# req_packages <- c("mclust", "tmvtnorm", "invgamma",
-#                   "truncnorm", "mvnfast", "sp",
-#                   "matrixStats", "ggplot2", "MCMCpack",
-#                   "mvtnorm", "devtools")
-# if (!require(req_packages)){
-#   install.packages(req_packages)
-#   devtools::install_github("jakesherman/easypackages")
-#   library(easypackages)
-#   libraries(req_packages)
-# }
-
-#' Main function for inference
+#' Main function for inference and posterior prediction
 #'
-#' This function evaluates the cumulative distribution of a univariate Gaussian distribution
+#' This function implements Gibbs sampling and computes posterior predictive distribution of test set
 #' @param mix Mixture type: one of "tmog" and "motg"
 #' @param data_type one of "gauss", "beta", "bvgauss", "flowcyto", "crime"
 #' @param thr vector of number of rejections per observations.
-#' @return samples from posterior distribution
+#' @return result from Gibbs sampling, posterior prediction of test set, posterior likelihood, and time
 #' @export
 #'
-inf_constr_mixmod <- function(mix, data_type, thr){
+inf_post_pred_mixmod <- function(mix, data_type, thr){
 
   # Check correct inputs
   if (!(mix %in% c("tmog", "motg"))){
@@ -44,10 +31,9 @@ inf_constr_mixmod <- function(mix, data_type, thr){
     samp_method <- "package"
   }
 
-
   K <- 50
-  burnIn   <- 2000
-  numIter  <- 5000
+  burn_in   <- 20
+  num_iter  <- 50
 
   # Maximum number of rejections
   ceil_rej <- 100000
@@ -268,7 +254,7 @@ inf_constr_mixmod <- function(mix, data_type, thr){
     # Function to run Gibbs sampling and timed
     start_time <- system.time({
       rslt[[j]] <- gibbs_sampling(K, ip_data = train,
-                            thr = thr[j], burnIn, numIter,
+                            thr = thr[j], burn_in, num_iter,
                             constr, mix, lower, upper, data_type)
     })
 
@@ -276,28 +262,15 @@ inf_constr_mixmod <- function(mix, data_type, thr){
 
     # Functions to compute posterior predictive probabilities of the test set
     if (dm == 1){
-      if (mix == "motg")
-        test_pred[[j]]  <- post_pred_motgt(res = rslt[[j]]$res,
-                                           test, K, pts, upper, lower,
-                                           data_type, pr1, pr2)
-      if (mix == "tmog")
-        test_pred[[j]]  <- post_pred_tmog(res = rslt[[j]]$res,
-                                           test, K, pts, upper, lower,
-                                           data_type, pr1, pr2)
-
+      test_pred[[j]]  <- post_pred_dist(mix, res = rslt[[j]]$res,
+                                       test, K, pts, upper, lower, data_type, pr1, pr2)
       prod_pred_ts[j]    <- sum(log(test_pred[[j]]$pred_ts))
       prod_pred_pt[j]    <- sum(log(test_pred[[j]]$pred_pt))
 
     } else {
-      if (mix == "motg")
-        test_pred[[j]]  <- post_pred_motgt_mv(res = rslt[[j]]$res,
-                                              test, K, lower, upper, constr)
-
-      if (mix == "tmog")
-        test_pred[[j]]  <- post_pred_tmog_mv(res = rslt[[j]]$res, test, K,
-                                              constr, thin_sc)
-
-      prod_pred_ts[j]    <- sum(log(test_pred[[j]]$pred_ts))
+      test_pred[[j]]   <- post_pred_dist_mv(mix, res = rslt[[j]]$res, test,
+                                            K, upper, lower, constr, thin_sc)
+      prod_pred_ts[j]  <- sum(log(test_pred[[j]]$pred_ts))
     }
 
     count_bins[[j]] <- count_rej(res_list = rslt[[j]]$res)
@@ -310,8 +283,89 @@ inf_constr_mixmod <- function(mix, data_type, thr){
   ppred_all <- prod_pred_ts
   time_all  <- time_taken
 
-  return(list(result = rslt, ppred = ppred_all, time = time_all))
+  return(list(result = rslt, test_pred = test_pred, ppred = ppred_all, time = time_all))
 }
+
+#' Main function for inference
+#'
+#' This function evaluates the cumulative distribution of a univariate Gaussian distribution
+#' @param mix Mixture type: one of "tmog" and "motg"
+#' @param X_data p-by-N matrix where N is the total number of observations and p is the dimension
+#' @param thr vector of number of rejections per observations.
+#' @param constr_type one of "rectangle" and "complex". If rectangle, follow by lower and upper bounds.
+#' @param ... pass lower and upper bounds of the constraint if type is "rectangle"
+#' @return samples from posterior distribution
+#' @export
+#'
+inf_constr_mixmod <- function(mix, X_data, constr, thr, constr_type, ...){
+
+  # Check correct inputs
+  if (!(mix %in% c("tmog", "motg"))){
+    stop("Mixture type must be one of 'tmog' or 'motg'")
+  }
+
+  if (thr < 0){
+    stop("Value of thr must be greater than 0")
+  }
+
+  if (!is.matrix(X_data)){
+    stop("Data must be in a p-by-N matrix format, where p is the number of dimensions and N is the number of observations")
+  }
+
+  if (constr_type == "rectangle"){
+    samp_method <- "package"
+    lower <- lower
+    upper <- upper
+  } else {
+    samp_method <- "is"
+  }
+
+  K <- 50
+  burn_in   <- 20
+  num_iter  <- 50
+
+  # Maximum number of rejections
+  ceil_rej <- 100000
+
+  # Thinning value for the MCMC samples on the posterior
+  thin_sc <- 1
+  thr_l   <- length(thr)
+
+  train <- X_data
+  dm    <- dim(train)[1]
+
+  # Initialize variables
+  time_taken    <- c()
+  count_bins    <- list()
+  rslt <- list()
+
+  print(paste("Mix:", mix))
+
+  # ============= Run Gibbs Sampling and Posterior Probabilities ============= #
+  # Loop over all thresholds
+  for (j in 1:length(thr)){
+    print(paste("Threshold: ", thr[j]))
+
+    # Function to run Gibbs sampling and timed
+    start_time  <- system.time({
+      rslt[[j]] <- gibbs_sampling(K, ip_data = train,
+                                  thr = thr[j], burn_in, num_iter,
+                                  constr, mix, lower, upper)
+    })
+
+    time_taken[j]   <- start_time[3]
+    count_bins[[j]] <- count_rej(res_list = rslt[[j]]$res)
+
+    print("*******************************")
+  }
+
+  time_all  <- time_taken
+
+  return(list(result = rslt, time = time_all))
+}
+
+
+
 
 
 
