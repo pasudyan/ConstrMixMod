@@ -8,7 +8,6 @@
 #' @param lower lower bound of constraints, only use for unit square
 #' @param realDens real density values at points
 #' @return list of prediction at points, prediction of tests, along with error bars
-#' @export
 #' @examples
 #'
 postPredMotg <- function(res, test, pts, upper, lower, realDens){
@@ -90,7 +89,6 @@ postPredMotg <- function(res, test, pts, upper, lower, realDens){
 #' @param lower lower bound of constraints, only use for unit square
 #' @param realDens real density values at points
 #' @return list of prediction at points, prediction of tests, along with error bars
-#' @export
 postPredTmog <- function(res, test, pts, upper, lower, realDens){
   K <- length(res[[1]]$wt)
   iter <- length(res)
@@ -238,7 +236,6 @@ postPredDist <- function(mix, constrType, res, test, pts, realDens, ...){
 #' @param thinsc thinning for MCMC chain (default no thinning)
 #' @param constrType one of "simple" or "complex". Follow with lower and upper bounds if "simple".
 #' @return list of prediction of tests
-#' @export
 postPredMotgMv <- function(res, test, constr, thinsc = 1, constrType, ...){
   # ================================================================================ #
   # Posterior predictive distribution for Mixture of Truncated Gaussian Approximate  #
@@ -306,7 +303,6 @@ postPredMotgMv <- function(res, test, constr, thinsc = 1, constrType, ...){
 #' @param thinsc thinning for MCMC chain (default no thinning)
 #' @param constrType one of "simple" or "complex". Follow with lower and upper bounds if "simple".
 #' @return list of prediction of tests
-#' @export
 postPredTmogMv <- function(res, test, constr, thinsc = 1, constrType, ...){
   # ================================================================================ #
   # Posterior predictive distribution for Truncated Mixtures of Gaussian             #
