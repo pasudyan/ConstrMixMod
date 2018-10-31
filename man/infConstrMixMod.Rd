@@ -4,7 +4,7 @@
 \alias{infConstrMixMod}
 \title{Main function for inference}
 \usage{
-infConstrMixMod(mix, Xdata, constr, K = 100, thr = 1, constrType,
+infConstrMixMod(mix, Xdata, constr, K = 100, thr = Inf, constrType,
   niwpr, ...)
 }
 \arguments{
@@ -20,9 +20,9 @@ infConstrMixMod(mix, Xdata, constr, K = 100, thr = 1, constrType,
 
 \item{constrType}{one of "simple" and "complex". If "simple", follow by lower and upper bounds.}
 
-\item{niwpr}{list of niw prior which includes m0, v0, a0, and b0}
+\item{niwpr}{list of niw prior. For one dimensional, must include m0, v0, a0, b0. For more than one dimension, must include mu0, lam, Phi, and nu.}
 
-\item{...}{pass lower and upper bounds of the constraint if type is "rectangle"}
+\item{...}{pass lower and upper bounds of the constraint if type is "simple". Can also pass burnIn and numIter (default burnIn = 2000 and numIter = 5000)}
 }
 \value{
 samples from posterior distribution

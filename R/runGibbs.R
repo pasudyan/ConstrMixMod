@@ -8,32 +8,28 @@
 #' @param thr vector of number of rejections per observations.
 #' @param constrType one of "simple" and "complex". If "simple", follow by lower and upper bounds.
 #' @param niwpr list of niw prior. For one dimensional, must include m0, v0, a0, b0. For more than one dimension, must include mu0, lam, Phi, and nu.
-#' @param ... pass lower and upper bounds of the constraint if type is "simple"
+#' @param ... pass lower and upper bounds of the constraint if type is "simple". Can also pass burnIn and numIter (default burnIn = 2000 and numIter = 5000)
 #' @return samples from posterior distribution
 #' @export
 #'
 infConstrMixMod <- function(mix, Xdata, constr, K = 100, thr = Inf, constrType, niwpr, ...){
 
+  dm <- dim(Xdata)[1]
+
   # Check correct inputs
   if (!(mix %in% c("tmog", "motg"))){
     stop("Mixture type must be one of 'tmog' or 'motg'")
   }
-
   if (thr < 0){
     stop("Value of thr must be greater than 0")
   }
-
   if (K < 0){
     stop("Value of K must be greater than 0")
   }
-
   if (!is.matrix(Xdata)){
     stop("Data must be in a p-by-N matrix format, where p is the number of dimensions and
          N is the number of observations")
   }
-
-  dm <- dim(Xdata)[1]
-
   if (constrType == "simple"){
     sampMethod <- "package"
     if (hasArg(lower) == T & hasArg(upper) == T){
@@ -46,9 +42,12 @@ infConstrMixMod <- function(mix, Xdata, constr, K = 100, thr = Inf, constrType, 
   } else {
     sampMethod <- "is"
   }
-
-  burnIn  <- 2000
-  numIter <- 5000
+  if (hasArg(burnIn) != T){
+    burnIn  <- 2000
+  }
+  if (hasArg(burnIn) != T){
+    numIter <- 5000
+  }
 
   # Maximum number of rejections
   ceilRej <- 100000
@@ -59,7 +58,6 @@ infConstrMixMod <- function(mix, Xdata, constr, K = 100, thr = Inf, constrType, 
 
   # Initialize variables
   rslt <- rep(list(list()), thrl)
-
   print(paste("Mix:", mix))
 
   # ============= Run Gibbs Sampling and Posterior Probabilities ============= #
@@ -73,7 +71,6 @@ infConstrMixMod <- function(mix, Xdata, constr, K = 100, thr = Inf, constrType, 
 
     print("*******************************")
   }
-
   return(result = rslt)
 }
 

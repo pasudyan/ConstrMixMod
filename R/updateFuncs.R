@@ -8,7 +8,6 @@
 #' @param constr function for the constraint
 #' @param thr maximum number of rejections per observation
 #' @return list of the new mean, covariance matrix, number of observations in each cluster, number of rejections, and the rejected samples
-#' @export
 updateParamsComponent <- function(X, mu, cv, niwpr, constr, thr = Inf) {
 
   dm <- dim(X)[1]
@@ -72,7 +71,6 @@ updateParamsComponent <- function(X, mu, cv, niwpr, constr, thr = Inf) {
 #' @param K total number of clusters
 #' @param alp hyperparameter of the dirichlet process prior
 #' @return vector of weights for every components
-#' @export
 updateWeights <- function(z, K, alp){
   count <- rep(0, K)
 
@@ -110,7 +108,6 @@ updateWeights <- function(z, K, alp){
 #' @param params list of parameters which include weights (wt), mean (mu), and covariance matrix (cv) for all clusters
 #' @param thr maximum number of rejected samples per observations
 #' @return vector of new cluster assignments
-#' @export
 updateClustAssignMotg <- function(K, ipdata, z, rej, N, params, thr) {
 
   dm <- dim(ipdata)[1]
@@ -186,7 +183,6 @@ updateClustAssignMotg <- function(K, ipdata, z, rej, N, params, thr) {
 #' @param N total number of observations
 #' @param params list of parameters which include weights (wt), mean (mu), and covariance matrix (cv) for all clusters
 #' @return vector of new cluster assignments
-#' @export
 updateClustAssignTmog <- function(K, ipdata, N, params) {
 
   dm <- dim(ipdata)[1]
@@ -294,7 +290,6 @@ updateParams <- function(K, alp, ipdata, niwpr, z) {
 #' @param niwpr normal-inverse-wishart prior
 #' @param zRejs cluster assignments for rejected proposals
 #' @return list of new weights, mean, covariance matrix, number of rejected proposals, and number of observations in each cluster
-#' @export
 updateParamsTmog <- function(K, alp, xRejs, wt, niwpr, zRejs) {
   # This function update the parameters for each component using
   # the stick breaking construction after observations are placed
