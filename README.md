@@ -5,7 +5,7 @@ The functions here are used to generate figures in the paper. The main function 
 ```r
 infConstrMixMod(mix, Xdata, constr, K, thr, constrType, niwpr, ...)
 ```
-The package also provides posterior predictive distribution through:
+The package also provides estimation of posterior predictive distribution for a given test set through:
 ```r
 postPredDist(mix, constrType, res, test, pts, realDens, ...)
 postPredDistMv(mix, constrType, res, test, constr, thinsc, ...)
