@@ -26,20 +26,20 @@ nig <- function(m0, v0, a0, b0) {
 #' @param SS a list which includes list(n = number of observations, mn = mean, S = covariance)
 #' @return a list with mean and variance
 #' @examples
-#' nig.post(0, 1, 2, 3, list(n = 2, mn = 1, S = 0.1))
+#' nigPost(0, 1, 2, 3, list(n = 2, mn = 1, S = 0.1))
 #'
-nig_post <- function(m0, v0, a0, b0, SS) {
-  n     <- SS$n
-  mn    <- SS$mn
-  S     <- SS$S  #S = t(X - mn) %*% (X - mn)
+nigPost <- function(m0, v0, a0, b0, SS) {
+  n  <- SS$n
+  mn <- SS$mn
+  S  <- SS$S  #S = t(X - mn) %*% (X - mn)
 
-  v_n   <- v0/(1 + n*v0)
-  a_n   <- a0 + n/2
+  vn <- v0/(1 + n*v0)
+  an <- a0 + n/2
 
-  mu_n  <- v_n*((1/v0)*m0 + n*mn)
-  b_n   <- b0 + 0.5*(m0^2/v0 + S - mu_n^2/v_n)
+  mu <- vn*((1/v0)*m0 + n*mn)
+  bn <- b0 + 0.5*(m0^2/v0 + S - mu^2/vn)
 
-  return(nig(mu_n, v_n, a_n, b_n))
+  return(nig(mu, vn, an, bn))
 }
 
 #'  Normal-Inverse-Wishart function
@@ -72,14 +72,14 @@ niw <- function(mu0, lam, Phi, nu) {
 #' @return a list with mean and covariance matrix
 #' @examples
 #' SS = list(n = 2, mn = rep(0.7, 2), S = diag(0.1,2))
-#' niw.post(rep(1/2,2), 1, diag(0.1, 2), 2, SS)
+#' niwPost(rep(1/2,2), 1, diag(0.1, 2), 2, SS)
 #'
-niw_post <- function(mu0, lam, Phi, nu, SS) {
-  n     <- SS$n
-  mn    <- SS$mn
-  S     <- SS$S     # S = t(X - mn) %*% (X - mn)
-  mu_n  <- (lam*mu0 + n*mn)/(lam + n)
-  Phi_n <- Phi + S + ((lam*n)/(lam + n))*outer(mn - mu0, mn - mu0)
+niwPost <- function(mu0, lam, Phi, nu, SS) {
+  n    <- SS$n
+  mn   <- SS$mn
+  S    <- SS$S     # S = t(X - mn) %*% (X - mn)
+  muN  <- (lam*mu0 + n*mn)/(lam + n)
+  Phin <- Phi + S + ((lam*n)/(lam + n))*outer(mn - mu0, mn - mu0)
 
-  return(niw(mu_n, lam + n, Phi_n, nu + n))
+  return(niw(muN, lam + n, Phin, nu + n))
 }
