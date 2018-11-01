@@ -1,89 +1,3 @@
-#' Rejection summary
-#'
-#' This function summarizes the value for the rejected samples
-#' @param rejs vector of rejected samples
-#' @param brks break points of the bins to summarize the rejections
-#' @return number of samples in the bins
-#'
-rejSummary <- function(rejs, brks){
-  rejAll <- rejs
-  bins    <- table(cut(rejAll, brks, include.lowest = T, right = F))
-  return(bins)
-}
-
-editProbLogNan <- function(X){
-  X[is.nan(X) == T] <- 1e-05
-  return(X)
-}
-
-is.empty <- function(listOf){
-  unlist(lapply(1:length(listOf), function(x){
-    if (length(listOf[[x]]) == 0)
-      return(TRUE)
-    else
-      return(FALSE)
-  }))
-}
-
-#' Counting the rejections
-#'
-#' This function summarizes the value for the rejected samples
-#' @param resList list of the results of the gibbs sampling procedure
-#' @return number of total rejections
-#'
-countRejs <- function(resList){
-  unlist(lapply(1:length(resList), function(x){
-    sum(resList[[x]]$cnt_rej)
-  }))
-}
-
-#'  Cumulative distribution function
-#'
-#' This function evaluates the cumulative distribution of a univariate Gaussian distribution
-#' @param mean mean of the distribution
-#' @param sd standard deviation of the distribution
-#' @param lower lower bound
-#' @param upper upper bound
-#' @return the area between the two bounds
-#' @examples
-#' constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
-#' mcInter(constr, 1/2, 0.1, 100)
-#'
-normCDF <- function(mean, sd, lower, upper){
-  return(pnorm(upper, mean, sd) - pnorm(lower, mean, sd))
-}
-
-#' Edit underflow of predictive probability
-#'
-#' This function edits the underflow of the predictive probability function for truncated Gaussian
-#' @param X vector of probabilities
-editPredProb <- function(X){
-  # ================================= #
-  # Function to edit overflows        #
-  # Returns edited values             #
-  # ================================= #
-
-  ind_pinf <- which(X %in% c(Inf))
-  ind_nan  <- which(is.nan(X) == T)
-  if (length(ind_pinf) > 0)
-    X[ind_pinf] <- 0
-  if (length(ind_nan) > 0)
-    X[ind_nan] <- 0
-  return(X)
-}
-
-#' Edit log probability
-#'
-#' This function edits the log probability for underflow and overflow. Substitute Inf to -Inf and NaN to -Inf.
-#' @param X vector of probabilities.
-#' @return vector of substituted log probabilities
-editLogProb <- function(X){
-  X[X == -Inf] <- -Inf
-  X[X == Inf]  <- -Inf
-  X[is.nan(X) == T]  <- -Inf
-  return(X)
-}
-
 #' Mixture of Gaussians
 #'
 #' This function generates mixtures of gaussians samples
@@ -112,58 +26,6 @@ genMog <- function(K = 2, paramList, N = 100, dm){
   return(list(x = t(X), z = z))
 }
 
-#' Edit probability
-#'
-#' This function fixes the underflow and overflow of probability output with 0's
-#' @param X vector of probabilities
-#' @return vector of fixed probabilities
-editProb <- function(X){
-  X[is.nan(X) == T] <- 0
-  X[X == Inf]       <- 0
-  return(X)
-}
-
-#' Normalize probabilities
-#'
-#' This function normalizes a probability distribution
-#' @param X vector of probabilities
-#' @return normalize vector of probabilities
-probNorm <- function(X){
-  norm <- X - matrixStats::logSumExp(X)
-  return(norm)
-}
-
-#' Index of rejections
-#'
-#' This function gives the rejected samples indices associated to the observation it belongs to
-#' @param vl a vector of TRUE/FALSE indicating whether the samples are inside or outside the constraints
-#' @param cInd number of last accepted observations
-giveInd <- function(vl, cind){
-  indt   <- which(vl == TRUE)
-  inda   <- rep(0, length(vl))
-  inda[indt] <- Inf
-  for (i in indt){
-    inda[i:length(vl)] <- inda[i:length(vl)] + 1
-  }
-
-  return(list(indRejObs = inda + cind, cind = length(indt)))
-}
-
-#' Index of last acceptance
-#'
-#' This function provides the index of the observations with that is last accepted
-#' @param numA total number of accepted samples
-#' @param left number of observations without rejected samples
-#' @param vl a vector of TRUE/FALSE indicating whether the samples are inside or outside the constraints
-#'
-indLastAcc <- function(numA, left, vl){
-  # Function to determine index of last few rejections
-
-  temp <- numA - (numA - left)
-  ind  <- which(vl == TRUE)[temp]
-  tInd <- which(vl[1:ind] == FALSE)
-  return(tInd)
-}
 
 #' Imputation of rejected samples
 #'
@@ -877,7 +739,143 @@ dtmvnormFast <- function(x, mean = rep(0, nrow(sigma)), sigma = diag(length(mean
   return(f)
 }
 
+#' Rejection summary
+#'
+#' This function summarizes the value for the rejected samples
+#' @param rejs vector of rejected samples
+#' @param brks break points of the bins to summarize the rejections
+#' @return number of samples in the bins
+#'
+rejSummary <- function(rejs, brks){
+  rejAll <- rejs
+  bins    <- table(cut(rejAll, brks, include.lowest = T, right = F))
+  return(bins)
+}
 
+editProbLogNan <- function(X){
+  X[is.nan(X) == T] <- 1e-05
+  return(X)
+}
 
+is.empty <- function(listOf){
+  unlist(lapply(1:length(listOf), function(x){
+    if (length(listOf[[x]]) == 0)
+      return(TRUE)
+    else
+      return(FALSE)
+  }))
+}
+
+#' Counting the rejections
+#'
+#' This function summarizes the value for the rejected samples
+#' @param resList list of the results of the gibbs sampling procedure
+#' @return number of total rejections
+#'
+countRejs <- function(resList){
+  unlist(lapply(1:length(resList), function(x){
+    sum(resList[[x]]$cnt_rej)
+  }))
+}
+
+#'  Cumulative distribution function
+#'
+#' This function evaluates the cumulative distribution of a univariate Gaussian distribution
+#' @param mean mean of the distribution
+#' @param sd standard deviation of the distribution
+#' @param lower lower bound
+#' @param upper upper bound
+#' @return the area between the two bounds
+#' @examples
+#' constr <- function(X, u1 = lower, u2 = upper) { X >= u1 & X <= u2 }
+#' mcInter(constr, 1/2, 0.1, 100)
+#'
+normCDF <- function(mean, sd, lower, upper){
+  return(pnorm(upper, mean, sd) - pnorm(lower, mean, sd))
+}
+
+#' Edit underflow of predictive probability
+#'
+#' This function edits the underflow of the predictive probability function for truncated Gaussian
+#' @param X vector of probabilities
+editPredProb <- function(X){
+  # ================================= #
+  # Function to edit overflows        #
+  # Returns edited values             #
+  # ================================= #
+
+  ind_pinf <- which(X %in% c(Inf))
+  ind_nan  <- which(is.nan(X) == T)
+  if (length(ind_pinf) > 0)
+    X[ind_pinf] <- 0
+  if (length(ind_nan) > 0)
+    X[ind_nan] <- 0
+  return(X)
+}
+
+#' Edit log probability
+#'
+#' This function edits the log probability for underflow and overflow. Substitute Inf to -Inf and NaN to -Inf.
+#' @param X vector of probabilities.
+#' @return vector of substituted log probabilities
+editLogProb <- function(X){
+  X[X == -Inf] <- -Inf
+  X[X == Inf]  <- -Inf
+  X[is.nan(X) == T]  <- -Inf
+  return(X)
+}
+
+#' Edit probability
+#'
+#' This function fixes the underflow and overflow of probability output with 0's
+#' @param X vector of probabilities
+#' @return vector of fixed probabilities
+editProb <- function(X){
+  X[is.nan(X) == T] <- 0
+  X[X == Inf]       <- 0
+  return(X)
+}
+
+#' Normalize probabilities
+#'
+#' This function normalizes a probability distribution
+#' @param X vector of probabilities
+#' @return normalize vector of probabilities
+probNorm <- function(X){
+  norm <- X - matrixStats::logSumExp(X)
+  return(norm)
+}
+
+#' Index of rejections
+#'
+#' This function gives the rejected samples indices associated to the observation it belongs to
+#' @param vl a vector of TRUE/FALSE indicating whether the samples are inside or outside the constraints
+#' @param cInd number of last accepted observations
+giveInd <- function(vl, cind){
+  indt   <- which(vl == TRUE)
+  inda   <- rep(0, length(vl))
+  inda[indt] <- Inf
+  for (i in indt){
+    inda[i:length(vl)] <- inda[i:length(vl)] + 1
+  }
+
+  return(list(indRejObs = inda + cind, cind = length(indt)))
+}
+
+#' Index of last acceptance
+#'
+#' This function provides the index of the observations with that is last accepted
+#' @param numA total number of accepted samples
+#' @param left number of observations without rejected samples
+#' @param vl a vector of TRUE/FALSE indicating whether the samples are inside or outside the constraints
+#'
+indLastAcc <- function(numA, left, vl){
+  # Function to determine index of last few rejections
+
+  temp <- numA - (numA - left)
+  ind  <- which(vl == TRUE)[temp]
+  tInd <- which(vl[1:ind] == FALSE)
+  return(tInd)
+}
 
 
