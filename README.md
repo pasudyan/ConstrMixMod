@@ -1,7 +1,7 @@
 # ConstrMixMod
 R package for [Flexible Mixture Modeling on Constrained Spaces](https://arxiv.org/abs/1809.09238)
 
-The functions here are used to generate figures in the paper. The main function to draw inference with Gibbs sampling is: 
+The functions here are used to generate results in the paper. The main function to draw inference with Gibbs sampling is: 
 ```r
 infConstrMixMod(mix, Xdata, constr, K, thr, constrType, niwpr, ...)
 ```
